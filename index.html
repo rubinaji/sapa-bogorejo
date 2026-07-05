@@ -3,179 +3,136 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ambil Antrian - Puskesmas Bogorejo</title>
+
+<title>Puseksmas Bogorejo - Pendaftaran</title>
 
 <style>
+
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:Arial,sans-serif
+font-family:Arial,sans-serif;
 }
 
 body{
 background:linear-gradient(135deg,#0f766e,#2563eb);
 min-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
 padding:20px;
 }
 
 .container{
-width:100%;
-max-width:1100px;
-background:#fff;
-border-radius:25px;
+max-width:500px;
+margin:auto;
+background:white;
+border-radius:30px;
 overflow:hidden;
-display:grid;
-grid-template-columns:320px 1fr 280px;
-box-shadow:0 20px 50px rgba(0,0,0,.2);
+box-shadow:0 15px 40px rgba(0,0,0,.2);
 }
 
-.left{
-background:#f8fafc;
-padding:40px;
+.header{
+padding:30px;
 text-align:center;
-display:flex;
-flex-direction:column;
-justify-content:center;
-}
-
-.left h1{
-color:#0f172a;
-font-size:38px;
-}
-
-.left p{
-margin-top:15px;
-color:#64748b;
-line-height:1.7;
+background:linear-gradient(135deg,#16a34a,#22c55e);
+color:white;
 }
 
 .logo{
-width:120px;
-height:120px;
-border-radius:50%;
-background:#16a34a;
-color:#fff;
-display:flex;
-justify-content:center;
-align-items:center;
-font-size:48px;
-margin:30px auto;
+font-size:60px;
+margin-bottom:10px;
 }
 
-.center{
-padding:40px;
+.header h1{
+font-size:28px;
 }
 
-.center h2{
-margin-bottom:25px;
-color:#0f172a;
+.header p{
+margin-top:10px;
+opacity:.9;
+}
+
+.content{
+padding:25px;
 }
 
 .label{
 font-weight:bold;
-margin:20px 0 10px;
+margin-top:20px;
+margin-bottom:10px;
 display:block;
+color:#334155;
 }
 
 .sapaan{
-display:flex;
+display:grid;
+grid-template-columns:1fr 1fr;
 gap:10px;
-flex-wrap:wrap;
 }
 
 .sapaan button{
-padding:12px 18px;
+padding:15px;
 border:none;
-border-radius:12px;
+border-radius:15px;
 background:#e2e8f0;
+font-size:16px;
 cursor:pointer;
 }
 
 .sapaan button.active{
 background:#16a34a;
-color:#fff;
+color:white;
 }
 
-input{
+input,select{
 width:100%;
-padding:15px;
+padding:16px;
+border-radius:15px;
 border:1px solid #cbd5e1;
-border-radius:12px;
 font-size:16px;
 }
 
 .submit{
 width:100%;
-margin-top:30px;
 padding:18px;
-background:#16a34a;
-color:#fff;
+margin-top:30px;
 border:none;
+border-radius:18px;
+background:#16a34a;
+color:white;
 font-size:20px;
-border-radius:15px;
+font-weight:bold;
 cursor:pointer;
 }
 
 .submit:disabled{
 background:#94a3b8;
-cursor:not-allowed;
 }
 
-.right{
-background:#f0fdf4;
-padding:40px;
-display:flex;
-flex-direction:column;
-justify-content:center;
-text-align:center;
-}
-
-.nomor{
-font-size:72px;
-font-weight:bold;
-color:#16a34a;
-margin:20px 0;
-}
-
-.card{
-padding:20px;
-border:2px dashed #86efac;
+#status{
+display:none;
+margin-top:20px;
+padding:15px;
+background:#dcfce7;
 border-radius:15px;
+text-align:center;
+font-weight:bold;
+color:#166534;
 }
 
-@media(max-width:900px){
-.container{
-grid-template-columns:1fr;
-}
-}
 </style>
-
 </head>
 
 <body>
 
 <div class="container">
 
-<div class="left">
+<div class="header">
 <div class="logo">🏥</div>
-
-<h1>Puskesmas Bogorejo</h1>
-
-<p>
-Sistem Antrian Terpadu
-<br>
-Silakan isi data diri untuk mengambil antrian pendaftaran.
-</p>
-
+<h1>SAPA Bogorejo</h1>
+<p>Pendaftaran Pasien</p>
 </div>
 
-<div class="center">
-
-<h2>Data Pasien</h2>
+<div class="content">
 
 <label class="label">Sapaan</label>
 
@@ -186,40 +143,36 @@ Silakan isi data diri untuk mengambil antrian pendaftaran.
 <button>Saudari</button>
 </div>
 
-<label class="label">Nama Lengkap</label>
+<label class="label">Nama Pasien</label>
 <input type="text" id="nama" placeholder="Masukkan nama pasien">
 
 <label class="label">Desa / Kelurahan</label>
-<input type="text" id="desa" placeholder="Masukkan desa atau kelurahan">
+<input type="text" id="desa" placeholder="Masukkan desa">
 
-<button class="submit" id="btnAmbil" onclick="ambilAntrian()">
-AMBIL ANTRIAN
+<label class="label">Klaster Tujuan</label>
+
+<select id="klaster">
+<option>Klaster 3 Dewasa dan Lansia</option>
+<option>Klaster II Ibu dan Anak (KIA)</option>
+<option>Klaster II Anak dan Remaja (MTBS)</option>
+<option>Klaster IV Penyakit Menular</option>
+<option>Laboratorium</option>
+<option>Apotek</option>
+<option>Gizi</option>
+<option>Imunisasi</option>
+<option>PONED</option>
+<option>Konseling</option>
+<option>Lintas Klaster (Gawat Darurat)</option>
+<option>Lintas Klaster (Gigi dan Mulut)</option>
+</select>
+
+<button class="submit" id="btnSimpan">
+SIMPAN DAN KIRIM
 </button>
 
-</div>
-
-<div class="right">
-
-<div class="card">
-
-<h3>Nomor Internal</h3>
-
-<div class="nomor" id="nomor">---</div>
-
-<p>
-Nomor ini hanya digunakan sistem untuk menjaga urutan pendaftaran.
-</p>
-
-<br>
-
-<p>
-<b>Pasien akan dipanggil menggunakan nama dan desa.</b>
-</p>
+<div id="status"></div>
 
 </div>
-
-</div>
-
 </div>
 
 <script>
@@ -230,78 +183,71 @@ let sapaan="Bapak";
 
 document.querySelectorAll(".sapaan button").forEach(btn=>{
 
-    btn.onclick=function(){
+btn.onclick=function(){
 
-        document.querySelectorAll(".sapaan button")
-        .forEach(x=>x.classList.remove("active"));
+document.querySelectorAll(".sapaan button")
+.forEach(x=>x.classList.remove("active"));
 
-        this.classList.add("active");
+this.classList.add("active");
 
-        sapaan=this.innerText;
+sapaan=this.innerText;
 
-    }
+}
 
 });
 
-async function ambilAntrian(){
+document.getElementById("btnSimpan").onclick=async()=>{
 
-    const nama=document.getElementById("nama").value.trim();
-    const desa=document.getElementById("desa").value.trim();
+const nama=document.getElementById("nama").value.trim();
+const desa=document.getElementById("desa").value.trim();
+const klaster=document.getElementById("klaster").value;
 
-    if(!nama || !desa){
-        alert("Nama dan desa wajib diisi");
-        return;
-    }
+if(!nama || !desa){
+alert("Nama dan desa wajib diisi");
+return;
+}
 
-    const tombol=document.getElementById("btnAmbil");
+const btn=document.getElementById("btnSimpan");
 
-    tombol.disabled=true;
-    tombol.innerText="MENYIMPAN...";
+btn.disabled=true;
+btn.innerText="MENYIMPAN...";
 
-    try{
+try{
 
-        const response=await fetch(API_URL,{
-            method:"POST",
-            body:JSON.stringify({
-                sapaan:sapaan,
-                nama:nama,
-                desa:desa
-            })
-        });
+const response=await fetch(API_URL,{
+method:"POST",
+body:JSON.stringify({
+sapaan:sapaan,
+nama:nama,
+desa:desa,
+klaster:klaster,
+aksi:"daftar_langsung"
+})
+});
 
-        const result=await response.json();
-        console.log(result);
-        alert(JSON.stringify(result));
+const result=await response.json();
 
-        if(result.status==="success"){
+document.getElementById("status").style.display="block";
 
-           document.getElementById("nomor").innerText=
-    result.id || "BERHASIL";
+document.getElementById("status").innerHTML=
+"✅ "+sapaan+" "+nama+
+" berhasil dikirim ke "+
+klaster;
 
-alert(
-    sapaan+" "+
-    nama+
-    " berhasil mengambil antrian."
-);
+document.getElementById("nama").value="";
+document.getElementById("desa").value="";
 
-            document.getElementById("nama").value="";
-            document.getElementById("desa").value="";
-        }
-        else{
-            alert(result.pesan || "Gagal menyimpan data");
-        }
+}
+catch(err){
 
-    }
-    catch(err){
+console.log(err);
 
-        console.log(err);
+alert("Gagal menyimpan data");
 
-        alert("Gagal menyimpan data");
+}
 
-    }
-
-    tombol.disabled=false;
-    tombol.innerText="AMBIL ANTRIAN";
+btn.disabled=false;
+btn.innerText="SIMPAN DAN KIRIM";
 
 }
 
