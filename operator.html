@@ -1,75 +1,246 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Operator Klaster</title>
+<title>Operator Klaster 3 Dewasa dan Lansia</title>
+
 <style>
-body{font-family:Arial;background:#f1f5f9;padding:20px}
-.container{display:grid;grid-template-columns:1fr 1fr 300px;gap:20px}
-.card{background:white;padding:20px;border-radius:20px;box-shadow:0 5px 20px rgba(0,0,0,.1)}
-h2{margin-top:0}
-.btn{display:block;width:100%;padding:15px;margin:10px 0;border:none;border-radius:12px;color:white;font-size:18px;cursor:pointer}
-.next{background:#16a34a}.repeat{background:#2563eb}.done{background:#f59e0b}.skip{background:#dc2626}
+body{
+    font-family:Arial;
+    background:#f1f5f9;
+    padding:20px;
+}
+
+.container{
+    display:grid;
+    grid-template-columns:1fr 1fr 300px;
+    gap:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:20px;
+    box-shadow:0 5px 20px rgba(0,0,0,.1);
+}
+
+h2{
+    margin-top:0;
+}
+
+.btn{
+    display:block;
+    width:100%;
+    padding:15px;
+    margin:10px 0;
+    border:none;
+    border-radius:12px;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+}
+
+.next{background:#16a34a;}
+.repeat{background:#2563eb;}
+.done{background:#f59e0b;}
+.skip{background:#dc2626;}
+
+li{
+    margin:10px 0;
+}
 </style>
 </head>
 <body>
+
 <h1>Operator Klaster 3 Dewasa dan Lansia</h1>
+
 <div class="container">
+
 <div class="card">
 <h2>Antrian Menunggu</h2>
-<ol>
-<li>Bapak Slamet - Bogorejo</li>
-<li>Ibu Rina - Gandu</li>
-<li>Saudara Andi - Sendangrejo</li>
+<ol id="listAntrian">
+Loading...
 </ol>
 </div>
 
 <div class="card">
 <h2>Sedang Dipanggil</h2>
-<h1>Bapak Suyanto</h1>
-<h3>Desa Jeruk</h3>
+
+<h1 id="namaPasien">Belum ada pasien</h1>
+<h3 id="desaPasien">-</h3>
+
 </div>
 
 <div class="card">
+
 <h2>Aksi</h2>
-<button class="btn next" onclick="panggilBerikutnya()">PANGGIL BERIKUTNYA</button>
-<button class="btn repeat" onclick="panggilUlang()">PANGGIL ULANG</button>
-<button class="btn done" onclick="selesai()">SELESAI DILAYANI</button>
-<button class="btn skip" onclick="lewati()">LEWATI / TIDAK HADIR</button>
+
+<button class="btn next" onclick="panggilBerikutnya()">
+PANGGIL BERIKUTNYA
+</button>
+
+<button class="btn repeat" onclick="panggilUlang()">
+PANGGIL ULANG
+</button>
+
+<button class="btn done" onclick="selesai()">
+SELESAI DILAYANI
+</button>
+
+<button class="btn skip" onclick="lewati()">
+LEWATI / TIDAK HADIR
+</button>
+
 </div>
+
 </div>
 
 <script>
+
 const API_URL="https://script.google.com/macros/s/AKfycbynj2fs_Q9zyrrQIwaaaifz7d6SetSpvo7wVDU1bcRFV4hDF3chrCFLpwI34e4g0Cc/exec";
 
+let pasienAktif=null;
+let daftar=[];
+
 async function loadAntrian(){
-  try{
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    console.log("Antrian dari server",data);
-  }catch(err){
-    console.log(err);
-  }
+
+    const res=await fetch(API_URL);
+    const data=await res.json();
+
+    daftar=data.filter(x=>
+        x.klaster==="Klaster 3 Dewasa dan Lansia" &&
+        x.status==="Menunggu Klaster"
+    );
+
+    const list=document.getElementById("listAntrian");
+
+    list.innerHTML="";
+
+    if(daftar.length===0){
+        list.innerHTML="<li>Tidak ada antrian</li>";
+        return;
+    }
+
+    daftar.forEach(item=>{
+
+        list.innerHTML+=`
+        <li>
+        ${item.sapaan} ${item.nama}
+        - ${item.desa}
+        </li>
+        `;
+
+    });
+
 }
 
-function panggilBerikutnya(){
-  alert("Memanggil pasien berikutnya...");
+function suara(teks){
+
+    const msg=new SpeechSynthesisUtterance(teks);
+    msg.lang="id-ID";
+    speechSynthesis.speak(msg);
+
+}
+
+async function panggilBerikutnya(){
+
+    if(daftar.length===0){
+        alert("Tidak ada antrian");
+        return;
+    }
+
+    pasienAktif=daftar[0];
+
+    document.getElementById("namaPasien").innerText=
+        pasienAktif.sapaan+" "+pasienAktif.nama;
+
+    document.getElementById("desaPasien").innerText=
+        "Desa "+pasienAktif.desa;
+
+    suara(
+        pasienAktif.sapaan+" "+
+        pasienAktif.nama+
+        " dari desa "+
+        pasienAktif.desa+
+        ", silakan masuk ke ruang pemeriksaan."
+    );
+
+    await fetch(API_URL,{
+        method:"POST",
+        body:JSON.stringify({
+            aksi:"panggil",
+            id:pasienAktif.id
+        })
+    });
+
+    loadAntrian();
+
 }
 
 function panggilUlang(){
-  alert("Mengulang panggilan pasien.");
+
+    if(!pasienAktif) return;
+
+    suara(
+        pasienAktif.sapaan+" "+
+        pasienAktif.nama+
+        " dari desa "+
+        pasienAktif.desa+
+        ", silakan masuk ke ruang pemeriksaan."
+    );
+
 }
 
-function selesai(){
-  alert("Pasien selesai dilayani.");
+async function selesai(){
+
+    if(!pasienAktif) return;
+
+    await fetch(API_URL,{
+        method:"POST",
+        body:JSON.stringify({
+            aksi:"selesai",
+            id:pasienAktif.id
+        })
+    });
+
+    pasienAktif=null;
+
+    document.getElementById("namaPasien").innerText=
+        "Belum ada pasien";
+
+    document.getElementById("desaPasien").innerText="-";
+
+    loadAntrian();
+
 }
 
-function lewati(){
-  alert("Pasien dilewati / tidak hadir.");
+async function lewati(){
+
+    if(!pasienAktif) return;
+
+    await fetch(API_URL,{
+        method:"POST",
+        body:JSON.stringify({
+            aksi:"lewati",
+            id:pasienAktif.id
+        })
+    });
+
+    pasienAktif=null;
+
+    document.getElementById("namaPasien").innerText=
+        "Belum ada pasien";
+
+    document.getElementById("desaPasien").innerText="-";
+
+    loadAntrian();
+
 }
 
 loadAntrian();
+
+setInterval(loadAntrian,5000);
+
 </script>
 
 </body>
