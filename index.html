@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ambil Antrian - Puskesmas Bogorejo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{
+background:linear-gradient(135deg,#0f766e,#2563eb);
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+}
+.container{
+width:100%;
+max-width:1100px;
+background:#fff;
+border-radius:25px;
+overflow:hidden;
+display:grid;
+grid-template-columns:320px 1fr 280px;
+box-shadow:0 20px 50px rgba(0,0,0,.2);
+}
+.left{
+background:#f8fafc;
+padding:40px;
+text-align:center;
+display:flex;
+flex-direction:column;
+justify-content:center;
+}
+.left h1{color:#0f172a;font-size:38px}
+.left p{margin-top:15px;color:#64748b;line-height:1.7}
+.logo{
+width:120px;height:120px;border-radius:50%;
+background:#16a34a;color:#fff;
+display:flex;justify-content:center;align-items:center;
+font-size:48px;margin:30px auto;
+}
+.center{padding:40px}
+.center h2{margin-bottom:25px;color:#0f172a}
+.label{font-weight:bold;margin:20px 0 10px;display:block}
+.sapaan{display:flex;gap:10px;flex-wrap:wrap}
+.sapaan button{
+padding:12px 18px;border:none;border-radius:12px;
+background:#e2e8f0;cursor:pointer
+}
+.sapaan button.active{background:#16a34a;color:#fff}
+input{
+width:100%;padding:15px;border:1px solid #cbd5e1;
+border-radius:12px;font-size:16px;
+}
+.submit{
+width:100%;margin-top:30px;padding:18px;
+background:#16a34a;color:#fff;border:none;
+font-size:20px;border-radius:15px;cursor:pointer;
+}
+.right{
+background:#f0fdf4;
+padding:40px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+text-align:center;
+}
+.nomor{
+font-size:72px;
+font-weight:bold;
+color:#16a34a;
+margin:20px 0;
+}
+.card{
+padding:20px;
+border:2px dashed #86efac;
+border-radius:15px;
+}
+@media(max-width:900px){
+.container{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="left">
+<div class="logo">🏥</div>
+<h1>Puskesmas Bogorejo</h1>
+<p>Sistem Antrian Terpadu<br>Silakan isi data diri untuk mengambil antrian pendaftaran.</p>
+</div>
+
+<div class="center">
+<h2>Data Pasien</h2>
+
+<label class="label">Sapaan</label>
+<div class="sapaan">
+<button class="active">Bapak</button>
+<button>Ibu</button>
+<button>Saudara</button>
+<button>Saudari</button>
+</div>
+
+<label class="label">Nama Lengkap</label>
+<input type="text" id="nama" placeholder="Masukkan nama pasien">
+
+<label class="label">Desa / Kelurahan</label>
+<input type="text" id="desa" placeholder="Masukkan desa atau kelurahan">
+
+<button class="submit" onclick="ambilAntrian()">AMBIL ANTRIAN</button>
+
+</div>
+
+<div class="right">
+<div class="card">
+<h3>Nomor Internal</h3>
+<div class="nomor" id="nomor">P001</div>
+<p>Nomor ini hanya digunakan sistem untuk menjaga urutan pendaftaran.</p>
+<br>
+<p><b>Pasien akan dipanggil menggunakan nama dan desa.</b></p>
+</div>
+</div>
+
+</div>
+
+<script>
+let sapaan = "Bapak";
+
+document.querySelectorAll(".sapaan button").forEach(btn=>{
+    btn.addEventListener("click",function(){
+        document.querySelectorAll(".sapaan button")
+        .forEach(b=>b.classList.remove("active"));
+
+        this.classList.add("active");
+        sapaan=this.innerText;
+    });
+});
+
+function ambilAntrian(){
+
+    const nama=document.getElementById("nama").value.trim();
+    const desa=document.getElementById("desa").value.trim();
+
+    if(!nama || !desa){
+        alert("Nama dan desa wajib diisi");
+        return;
+    }
+
+    let nomor=parseInt(localStorage.getItem("nomorPendaftaran") || 0)+1;
+    localStorage.setItem("nomorPendaftaran",nomor);
+
+    const kode="P"+String(nomor).padStart(3,"0");
+    document.getElementById("nomor").innerText=kode;
+
+    const data={
+        id:kode,
+        sapaan:sapaan,
+        nama:nama,
+        desa:desa
+    };
+
+    fetch("https://script.google.com/macros/s/AKfycbynj2fs_Q9zyrrQIwaaaifz7d6SetSpvo7wVDU1bcRFV4hDF3chrCFLpwI34e4g0Cc/exec",{
+        method:"POST",
+        body:JSON.stringify(data)
+    })
+    .then(res=>res.json())
+    .then(result=>{
+        alert(`${sapaan} ${nama} dari Desa ${desa} berhasil mengambil antrian.`);
+        document.getElementById("nama").value="";
+        document.getElementById("desa").value="";
+    })
+    .catch(err=>{
+        console.log(err);
+        alert("Gagal menyimpan ke server.");
+    });
+}
+</script>
+
+</body>
+</html>

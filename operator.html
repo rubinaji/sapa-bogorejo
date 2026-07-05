@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Operator Klaster</title>
+<style>
+body{font-family:Arial;background:#f1f5f9;padding:20px}
+.container{display:grid;grid-template-columns:1fr 1fr 300px;gap:20px}
+.card{background:white;padding:20px;border-radius:20px;box-shadow:0 5px 20px rgba(0,0,0,.1)}
+h2{margin-top:0}
+.btn{display:block;width:100%;padding:15px;margin:10px 0;border:none;border-radius:12px;color:white;font-size:18px;cursor:pointer}
+.next{background:#16a34a}.repeat{background:#2563eb}.done{background:#f59e0b}.skip{background:#dc2626}
+</style>
+</head>
+<body>
+<h1>Operator Klaster 3 Dewasa dan Lansia</h1>
+<div class="container">
+<div class="card">
+<h2>Antrian Menunggu</h2>
+<ol>
+<li>Bapak Slamet - Bogorejo</li>
+<li>Ibu Rina - Gandu</li>
+<li>Saudara Andi - Sendangrejo</li>
+</ol>
+</div>
+
+<div class="card">
+<h2>Sedang Dipanggil</h2>
+<h1>Bapak Suyanto</h1>
+<h3>Desa Jeruk</h3>
+</div>
+
+<div class="card">
+<h2>Aksi</h2>
+<button class="btn next" onclick="panggilBerikutnya()">PANGGIL BERIKUTNYA</button>
+<button class="btn repeat" onclick="panggilUlang()">PANGGIL ULANG</button>
+<button class="btn done" onclick="selesai()">SELESAI DILAYANI</button>
+<button class="btn skip" onclick="lewati()">LEWATI / TIDAK HADIR</button>
+</div>
+</div>
+
+<script>
+const API_URL="https://script.google.com/macros/s/AKfycbynj2fs_Q9zyrrQIwaaaifz7d6SetSpvo7wVDU1bcRFV4hDF3chrCFLpwI34e4g0Cc/exec";
+
+async function loadAntrian(){
+  try{
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    console.log("Antrian dari server",data);
+  }catch(err){
+    console.log(err);
+  }
+}
+
+function panggilBerikutnya(){
+  alert("Memanggil pasien berikutnya...");
+}
+
+function panggilUlang(){
+  alert("Mengulang panggilan pasien.");
+}
+
+function selesai(){
+  alert("Pasien selesai dilayani.");
+}
+
+function lewati(){
+  alert("Pasien dilewati / tidak hadir.");
+}
+
+loadAntrian();
+</script>
+
+</body>
+</html>

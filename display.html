@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAPA Bogorejo - Display</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#0f172a;color:white;padding:20px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.klaster{font-size:42px;font-weight:bold}
+.waktu{text-align:right;font-size:22px}
+.main{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+.card{background:#1e293b;border-radius:25px;padding:30px}
+.center{text-align:center}
+.judul{font-size:30px;margin-bottom:20px;color:#94a3b8}
+.nama{font-size:64px;font-weight:bold;color:#4ade80;margin:20px 0}
+.desa{font-size:38px;margin-bottom:30px}
+.tujuan{font-size:30px}
+li{font-size:24px;margin:15px 0}
+.footer{margin-top:20px;text-align:center;font-size:20px;color:#94a3b8}
+</style>
+</head>
+<body>
+
+<div class="header">
+<div class="klaster" id="klasterNama">MEMUAT...</div>
+<div class="waktu">
+<div id="tanggal"></div>
+<div id="jam"></div>
+</div>
+</div>
+
+<div class="main">
+<div class="card center">
+<div class="judul">SEDANG DIPANGGIL</div>
+<div class="nama" id="nama">-</div>
+<div class="desa" id="desa">-</div>
+<div class="tujuan">
+Dipersilakan menuju<br>
+<span id="tujuanKlaster">-</span>
+</div>
+</div>
+
+<div class="card">
+<div class="judul">MENUNGGU</div>
+<ol id="antrianList"></ol>
+</div>
+</div>
+
+<div class="footer">
+Terima kasih atas kesabaran Anda • SAPA Bogorejo
+</div>
+
+<script>
+const API_URL="https://script.google.com/macros/s/AKfycbynj2fs_Q9zyrrQIwaaaifz7d6SetSpvo7wVDU1bcRFV4hDF3chrCFLpwI34e4g0Cc/exec";
+const params=new URLSearchParams(window.location.search);
+const klaster=params.get('klaster') || 'Klaster 3 Dewasa dan Lansia';
+
+document.getElementById('klasterNama').innerText=klaster.toUpperCase();
+document.getElementById('tujuanKlaster').innerText=klaster;
+
+function updateClock(){
+ const now=new Date();
+ document.getElementById('tanggal').innerText=now.toLocaleDateString('id-ID',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+ document.getElementById('jam').innerText=now.toLocaleTimeString('id-ID');
+}
+setInterval(updateClock,1000); updateClock();
+
+async function loadDisplay(){
+ try{
+   const res=await fetch(API_URL);
+   const data=await res.json();
+
+   const dipanggil=data.find(x=>x.klaster===klaster && x.status==="Dipanggil");
+
+   if(dipanggil){
+      document.getElementById('nama').innerText=dipanggil.sapaan+" "+dipanggil.nama;
+      document.getElementById('desa').innerText="Desa "+dipanggil.desa;
+   }
+
+   const tunggu=data.filter(x=>x.klaster===klaster && x.status==="Menunggu Klaster");
+   document.getElementById('antrianList').innerHTML=
+      tunggu.map(x=>`<li>${x.sapaan} ${x.nama} - ${x.desa}</li>`).join('');
+ }catch(e){
+   console.log(e);
+ }
+}
+loadDisplay();
+setInterval(loadDisplay,3000);
+</script>
+</body>
+</html>
