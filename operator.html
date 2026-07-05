@@ -50,6 +50,7 @@ li{
 }
 </style>
 </head>
+
 <body>
 
 <h1>Operator Klaster 3 Dewasa dan Lansia</h1>
@@ -99,6 +100,8 @@ LEWATI / TIDAK HADIR
 
 const API_URL="https://script.google.com/macros/s/AKfycbxiAWcEb7qPLXPx0IY7z0aAKZY4CUttuhkzupvpbcnhdXk8YOBmNvtRmWI3phB6XxAR/exec";
 
+const NAMA_KLASTER="Klaster 3 Dewasa dan Lansia";
+
 let pasienAktif=null;
 let daftar=[];
 
@@ -108,7 +111,7 @@ async function loadAntrian(){
     const data=await res.json();
 
     daftar=data.filter(x=>
-        x.klaster==="Klaster 3 Dewasa dan Lansia" &&
+        x.klaster===NAMA_KLASTER &&
         x.status==="Menunggu Klaster"
     );
 
@@ -123,10 +126,10 @@ async function loadAntrian(){
 
     daftar.forEach(item=>{
 
-        list.innerHTML+=`
+        list.innerHTML += `
         <li>
-        ${item.sapaan} ${item.nama}
-        - ${item.desa}
+            ${item.sapaan} ${item.nama}
+            - ${item.desa}
         </li>
         `;
 
@@ -148,6 +151,15 @@ async function panggilBerikutnya(){
         alert("Tidak ada antrian");
         return;
     }
+
+    // otomatis selesaikan pasien sebelumnya
+    await fetch(API_URL,{
+        method:"POST",
+        body:JSON.stringify({
+            aksi:"selesaikan_dipanggil",
+            klaster:NAMA_KLASTER
+        })
+    });
 
     pasienAktif=daftar[0];
 
@@ -179,7 +191,10 @@ async function panggilBerikutnya(){
 
 function panggilUlang(){
 
-    if(!pasienAktif) return;
+    if(!pasienAktif){
+        alert("Belum ada pasien dipanggil");
+        return;
+    }
 
     suara(
         pasienAktif.sapaan+" "+
@@ -193,7 +208,10 @@ function panggilUlang(){
 
 async function selesai(){
 
-    if(!pasienAktif) return;
+    if(!pasienAktif){
+        alert("Belum ada pasien aktif");
+        return;
+    }
 
     await fetch(API_URL,{
         method:"POST",
@@ -216,7 +234,10 @@ async function selesai(){
 
 async function lewati(){
 
-    if(!pasienAktif) return;
+    if(!pasienAktif){
+        alert("Belum ada pasien aktif");
+        return;
+    }
 
     await fetch(API_URL,{
         method:"POST",
