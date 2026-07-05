@@ -50,8 +50,7 @@ body{
 }
 
 .card:hover{
-    background:#f0fdf4;
-    border-color:#16a34a;
+    background:#dcfce7;
 }
 
 .selected{
@@ -72,6 +71,10 @@ select,button{
     border-radius:12px;
     margin-top:15px;
     font-size:18px;
+}
+
+select{
+    border:1px solid #ccc;
 }
 
 button{
@@ -100,146 +103,166 @@ button:hover{
 
 <div class="container">
 
-<div class="left">
-    <h2>Menunggu Pendaftaran</h2>
-    <br>
-    <div id="listPasien">Memuat data...</div>
-</div>
-
-<div class="right">
-
-    <h2>Ruang Pendaftaran</h2>
-    <br>
-
-    <div class="info">
-        <h3 id="nama">Pilih pasien</h3>
-        <p id="desa">-</p>
-        <p id="idPasien">ID Internal : -</p>
+    <div class="left">
+        <h2>Menunggu Pendaftaran</h2>
+        <br>
+        <div id="listPasien">Memuat data...</div>
     </div>
 
-    <label>Pilih Klaster Tujuan</label>
+    <div class="right">
 
-    <select id="klaster">
-        <option>Klaster 3 Dewasa dan Lansia</option>
-        <option>Klaster II Ibu dan Anak (KIA)</option>
-        <option>Klaster II Anak dan Remaja (MTBS)</option>
-        <option>Klaster IV Penyakit Menular</option>
-        <option>Laboratorium</option>
-        <option>Apotek</option>
-        <option>Gizi</option>
-        <option>Imunisasi</option>
-        <option>PONED</option>
-        <option>Konseling</option>
-        <option>Lintas Klaster (Gawat Darurat)</option>
-        <option>Lintas Klaster (Gigi dan Mulut)</option>
-    </select>
+        <h2>Ruang Pendaftaran</h2>
+        <br>
 
-    <button onclick="kirim()">
-        KIRIM KE KLASTER
-    </button>
+        <div class="info">
+            <h3 id="nama">Pilih pasien</h3>
+            <p id="desa">-</p>
+            <p id="idPasien">ID Internal : -</p>
+        </div>
 
-    <div id="status"></div>
+        <label>Pilih Klaster Tujuan</label>
 
-</div>
+        <select id="klaster">
+            <option value="Klaster 3 Dewasa dan Lansia">Klaster 3 Dewasa dan Lansia</option>
+            <option value="Klaster II Ibu dan Anak (KIA)">Klaster II Ibu dan Anak (KIA)</option>
+            <option value="Klaster II Anak dan Remaja (MTBS)">Klaster II Anak dan Remaja (MTBS)</option>
+            <option value="Klaster IV Penyakit Menular">Klaster IV Penyakit Menular</option>
+            <option value="Laboratorium">Laboratorium</option>
+            <option value="Apotek">Apotek</option>
+            <option value="Gizi">Gizi</option>
+            <option value="Imunisasi">Imunisasi</option>
+            <option value="PONED">PONED</option>
+            <option value="Konseling">Konseling</option>
+            <option value="Lintas Klaster (Gawat Darurat)">Lintas Klaster (Gawat Darurat)</option>
+            <option value="Lintas Klaster (Gigi dan Mulut)">Lintas Klaster (Gigi dan Mulut)</option>
+        </select>
+
+        <button id="btnKirim">
+            KIRIM KE KLASTER
+        </button>
+
+        <div id="status"></div>
+
+    </div>
+
 </div>
 
 <script>
 
 const API_URL="https://script.google.com/macros/s/AKfycbynj2fs_Q9zyrrQIwaaaifz7d6SetSpvo7wVDU1bcRFV4hDF3chrCFLpwI34e4g0Cc/exec";
 
-let idAktif=null;
+let pasienAktif = null;
 
 async function loadData(){
 
-    const response=await fetch(API_URL);
-    const data=await response.json();
+    try{
 
-    const pasien=data.filter(
-        x=>x.status==="Menunggu Pendaftaran"
-    );
+        const res = await fetch(API_URL);
+        const data = await res.json();
 
-    const list=document.getElementById("listPasien");
+        const list = document.getElementById("listPasien");
+        list.innerHTML="";
 
-    list.innerHTML="";
+        const pasien = data.filter(
+            x => x.status === "Menunggu Pendaftaran"
+        );
 
-    pasien.forEach(item=>{
+        if(pasien.length===0){
+            list.innerHTML="<p>Tidak ada pasien menunggu.</p>";
+            return;
+        }
 
-        const card=document.createElement("div");
+        pasien.forEach(item=>{
 
-        card.className="card";
+            const card=document.createElement("div");
+            card.className="card";
 
-        card.innerHTML=`
-            <b>${item.id} - ${item.sapaan} ${item.nama}</b><br>
-            Desa ${item.desa}
-        `;
+            card.innerHTML=`
+                <b>${item.id} - ${item.sapaan} ${item.nama}</b><br>
+                Desa ${item.desa}
+            `;
 
-        card.onclick=function(){
+            card.onclick=()=>{
 
-            document.querySelectorAll(".card").forEach(c=>{
-                c.classList.remove("selected");
-            });
+                document.querySelectorAll(".card").forEach(x=>{
+                    x.classList.remove("selected");
+                });
 
-            card.classList.add("selected");
+                card.classList.add("selected");
 
-            idAktif=item.id;
+                pasienAktif=item;
 
-            document.getElementById("nama").innerText=
-                item.sapaan+" "+item.nama;
+                document.getElementById("nama").innerText=
+                    item.sapaan+" "+item.nama;
 
-            document.getElementById("desa").innerText=
-                "Desa "+item.desa;
+                document.getElementById("desa").innerText=
+                    "Desa "+item.desa;
 
-            document.getElementById("idPasien").innerText=
-                "ID Internal : "+item.id;
-        };
+                document.getElementById("idPasien").innerText=
+                    "ID Internal : "+item.id;
+            };
 
-        list.appendChild(card);
+            list.appendChild(card);
 
-    });
+        });
+
+    }catch(err){
+        console.log(err);
+    }
 
 }
 
-function kirim(){
+document.getElementById("btnKirim").onclick = async function(){
 
-    if(!idAktif){
+    if(!pasienAktif){
         alert("Pilih pasien terlebih dahulu");
         return;
     }
 
-    const klaster=
-        document.getElementById("klaster").value;
+    const klaster=document.getElementById("klaster").value;
 
-    fetch(API_URL,{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-            aksi:"pindah_klaster",
-            id:idAktif,
-            klaster:klaster
-        })
-    })
-    .then(r=>r.json())
-    .then(data=>{
+    try{
 
-        document.getElementById("status").style.display="block";
+        const response = await fetch(API_URL,{
+            method:"POST",
+            body:JSON.stringify({
+                aksi:"pindah_klaster",
+                id:pasienAktif.id,
+                klaster:klaster
+            })
+        });
 
-        document.getElementById("status").innerHTML=
-        "✅ Pasien berhasil dipindahkan ke "+klaster;
+        const result = await response.json();
 
-        idAktif=null;
+        if(result.status==="success"){
 
-        loadData();
+            document.getElementById("status").style.display="block";
+            document.getElementById("status").innerHTML=
+            "✅ "+pasienAktif.id+" berhasil dikirim ke "+klaster;
 
-    });
+            pasienAktif=null;
+
+            document.getElementById("nama").innerText="Pilih pasien";
+            document.getElementById("desa").innerText="-";
+            document.getElementById("idPasien").innerText="ID Internal : -";
+
+            loadData();
+
+        }else{
+            alert(result.pesan);
+        }
+
+    }catch(err){
+        console.log(err);
+        alert("Gagal terhubung ke server");
+    }
 
 }
 
 loadData();
 
 setInterval(()=>{
-    if(idAktif==null){
+    if(!pasienAktif){
         loadData();
     }
 },5000);
