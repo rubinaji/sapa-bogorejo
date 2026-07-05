@@ -37,17 +37,6 @@ flex-direction:column;
 justify-content:center;
 }
 
-.left h1{
-color:#0f172a;
-font-size:38px;
-}
-
-.left p{
-margin-top:15px;
-color:#64748b;
-line-height:1.7;
-}
-
 .logo{
 width:120px;
 height:120px;
@@ -58,16 +47,11 @@ display:flex;
 justify-content:center;
 align-items:center;
 font-size:48px;
-margin:30px auto;
+margin:20px auto;
 }
 
 .center{
 padding:40px;
-}
-
-.center h2{
-margin-bottom:25px;
-color:#0f172a;
 }
 
 .label{
@@ -115,15 +99,11 @@ border-radius:15px;
 cursor:pointer;
 }
 
-.submit:hover{
-background:#15803d;
-}
-
 .right{
 background:#f0fdf4;
 padding:40px;
 display:flex;
-flex-direction:column;
+align-items:center;
 justify-content:center;
 text-align:center;
 }
@@ -133,12 +113,6 @@ font-size:72px;
 font-weight:bold;
 color:#16a34a;
 margin:20px 0;
-}
-
-.card{
-padding:20px;
-border:2px dashed #86efac;
-border-radius:15px;
 }
 
 @media(max-width:900px){
@@ -156,10 +130,7 @@ grid-template-columns:1fr;
 <div class="left">
 <div class="logo">🏥</div>
 <h1>Puskesmas Bogorejo</h1>
-<p>
-Sistem Antrian Terpadu<br>
-Silakan isi data diri untuk mengambil antrian pendaftaran.
-</p>
+<p>Sistem Antrian Terpadu</p>
 </div>
 
 <div class="center">
@@ -176,65 +147,43 @@ Silakan isi data diri untuk mengambil antrian pendaftaran.
 </div>
 
 <label class="label">Nama Lengkap</label>
-<input type="text" id="nama" placeholder="Masukkan nama pasien">
+<input type="text" id="nama">
 
 <label class="label">Desa / Kelurahan</label>
-<input type="text" id="desa" placeholder="Masukkan desa atau kelurahan">
+<input type="text" id="desa">
 
-<button class="submit" onclick="ambilAntrian()">
+<button class="submit" id="btnAmbil">
 AMBIL ANTRIAN
 </button>
 
 </div>
 
 <div class="right">
-
-<div class="card">
-
+<div>
 <h3>Nomor Internal</h3>
-
-<div class="nomor" id="nomor">
----
+<div class="nomor" id="nomor">---</div>
 </div>
-
-<p>
-Nomor ini hanya digunakan sistem untuk menjaga urutan pendaftaran.
-</p>
-
-<br>
-
-<p>
-<b>Pasien akan dipanggil menggunakan nama dan desa.</b>
-</p>
-
-</div>
-
 </div>
 
 </div>
 
 <script>
 
-const API_URL="https://script.google.com/macros/s/AKfycbynj2fs_Q9zyrrQIwaaaifz7d6SetSpvo7wVDU1bcRFV4hDF3chrCFLpwI34e4g0Cc/exec";
+const API_URL="ISI_URL_APPS_SCRIPT_DISINI";
 
 let sapaan="Bapak";
 
 document.querySelectorAll(".sapaan button").forEach(btn=>{
-
     btn.onclick=function(){
-
         document.querySelectorAll(".sapaan button")
-        .forEach(b=>b.classList.remove("active"));
+        .forEach(x=>x.classList.remove("active"));
 
         this.classList.add("active");
-
         sapaan=this.innerText;
-
-    }
-
+    };
 });
 
-async function ambilAntrian(){
+document.getElementById("btnAmbil").onclick=async()=>{
 
     const nama=document.getElementById("nama").value.trim();
     const desa=document.getElementById("desa").value.trim();
@@ -243,6 +192,11 @@ async function ambilAntrian(){
         alert("Nama dan desa wajib diisi");
         return;
     }
+
+    const tombol=document.getElementById("btnAmbil");
+
+    tombol.disabled=true;
+    tombol.innerText="MENYIMPAN...";
 
     try{
 
@@ -257,28 +211,30 @@ async function ambilAntrian(){
 
         const result=await response.json();
 
-        document.getElementById("nomor").innerText=result.id;
+        if(result.status==="success"){
 
-        alert(
-            sapaan+" "+
-            nama+
-            " berhasil mengambil antrian dengan nomor "+
-            result.id
-        );
+            document.getElementById("nomor").innerText=result.id;
 
-        document.getElementById("nama").value="";
-        document.getElementById("desa").value="";
+            alert(
+                sapaan+" "+
+                nama+
+                " berhasil mengambil nomor "+
+                result.id
+            );
 
-    }
-    catch(err){
+            document.getElementById("nama").value="";
+            document.getElementById("desa").value="";
+        }
 
+    }catch(err){
+        alert("Gagal menyimpan data");
         console.log(err);
-
-        alert("Gagal menyimpan ke server");
-
     }
 
-}
+    tombol.disabled=false;
+    tombol.innerText="AMBIL ANTRIAN";
+
+};
 
 </script>
 
