@@ -273,14 +273,14 @@ async function ambilAntrian(){
 
         if(result.status==="success"){
 
-            document.getElementById("nomor").innerText=result.id;
+           document.getElementById("nomor").innerText=
+    result.id || "BERHASIL";
 
-            alert(
-                sapaan+" "+
-                nama+
-                " berhasil mengambil nomor "+
-                result.id
-            );
+alert(
+    sapaan+" "+
+    nama+
+    " berhasil mengambil antrian."
+);
 
             document.getElementById("nama").value="";
             document.getElementById("desa").value="";
