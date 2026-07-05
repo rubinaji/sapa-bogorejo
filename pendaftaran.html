@@ -167,8 +167,8 @@ async function loadData(){
         const list=document.getElementById("listPasien");
         list.innerHTML="";
 
-        const pasien=data.filter(
-            x=>x.status==="Menunggu Pendaftaran"
+        const pasien=data.filter(item=>
+            item.status==="Menunggu Pendaftaran"
         );
 
         if(pasien.length===0){
@@ -179,12 +179,16 @@ async function loadData(){
         pasien.forEach(item=>{
 
             const card=document.createElement("div");
-
             card.className="card";
 
+            const id=item.id || "-";
+            const sapaan=item.sapaan || "";
+            const nama=item.nama || "";
+            const desa=item.desa || "-";
+
             card.innerHTML=`
-                <b>${item.id} - ${item.sapaan} ${item.nama}</b><br>
-                Desa ${item.desa}
+                <b>${id} - ${sapaan} ${nama}</b><br>
+                Desa ${desa}
             `;
 
             card.onclick=function(){
@@ -197,25 +201,22 @@ async function loadData(){
                 pasienAktif=item;
 
                 document.getElementById("nama").innerText=
-                    item.sapaan+" "+item.nama;
+                    `${sapaan} ${nama}`;
 
                 document.getElementById("desa").innerText=
-                    "Desa "+item.desa;
+                    `Desa ${desa}`;
 
                 document.getElementById("idPasien").innerText=
-                    "ID Internal : "+item.id;
-
+                    `ID Internal : ${id}`;
             };
 
             list.appendChild(card);
 
         });
 
-    }
-    catch(err){
+    }catch(err){
         console.log(err);
     }
-
 }
 
 document.getElementById("btnKirim").onclick=async()=>{
@@ -232,48 +233,40 @@ document.getElementById("btnKirim").onclick=async()=>{
 
     const klaster=document.getElementById("klaster").value;
 
+    const idSelesai=pasienAktif.id;
+
     try{
 
         await fetch(API_URL,{
             method:"POST",
             body:JSON.stringify({
                 aksi:"pindah_klaster",
-                id:pasienAktif.id,
+                id:idSelesai,
                 klaster:klaster
             })
         });
 
         document.getElementById("status").style.display="block";
-
         document.getElementById("status").innerHTML=
-            "✅ "+pasienAktif.id+
-            " berhasil dikirim ke "+
-            klaster;
+            `✅ ${idSelesai} berhasil dikirim ke ${klaster}`;
 
         pasienAktif=null;
 
-        document.getElementById("nama").innerText=
-            "Pilih pasien";
-
+        document.getElementById("nama").innerText="Pilih pasien";
         document.getElementById("desa").innerText="-";
+        document.getElementById("idPasien").innerText="ID Internal : -";
 
-        document.getElementById("idPasien").innerText=
-            "ID Internal : -";
+        setTimeout(loadData,500);
 
-        loadData();
-
-    }
-    catch(err){
+    }catch(err){
 
         console.log(err);
-
         alert("Gagal mengirim ke klaster");
 
     }
 
     tombol.disabled=false;
     tombol.innerText="KIRIM KE KLASTER";
-
 };
 
 loadData();
