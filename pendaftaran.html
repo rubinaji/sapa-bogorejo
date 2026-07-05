@@ -46,7 +46,7 @@ body{
     margin-bottom:15px;
     border:1px solid #ddd;
     cursor:pointer;
-    transition:.3s;
+    transition:0.3s;
 }
 
 .card:hover{
@@ -97,6 +97,15 @@ button:hover{
     padding:15px;
     border-radius:12px;
 }
+
+h2{
+    margin-bottom:15px;
+}
+
+#rowInfo{
+    color:#666;
+    font-size:14px;
+}
 </style>
 </head>
 
@@ -106,14 +115,12 @@ button:hover{
 
     <div class="left">
         <h2>Menunggu Pendaftaran</h2>
-        <br>
         <div id="listPasien">Memuat data...</div>
     </div>
 
     <div class="right">
 
         <h2>Ruang Pendaftaran</h2>
-        <br>
 
         <div class="info">
             <h3 id="nama">Pilih pasien</h3>
@@ -153,22 +160,21 @@ button:hover{
 
 const API_URL="https://script.google.com/macros/s/AKfycbynj2fs_Q9zyrrQIwaaaifz7d6SetSpvo7wVDU1bcRFV4hDF3chrCFLpwI34e4g0Cc/exec";
 
-let rowAktif = null;
+let rowAktif=null;
 
 async function loadData(){
 
     try{
 
-        const response = await fetch(API_URL);
-        const data = await response.json();
+        const response=await fetch(API_URL);
+        const data=await response.json();
 
-        console.log("DATA API:",data);
-
-        const pasien = data.filter(item =>
-            item.status === "Menunggu Pendaftaran"
+        const pasien=data.filter(item =>
+            item.status==="Menunggu Pendaftaran"
         );
 
-        const list = document.getElementById("listPasien");
+        const list=document.getElementById("listPasien");
+
         list.innerHTML="";
 
         if(pasien.length===0){
@@ -182,12 +188,11 @@ async function loadData(){
             card.className="card";
 
             card.innerHTML=`
-                <b>${item.id} - ${item.sapaan} ${item.nama}</b>
-                <br>
+                <b>${item.id} - ${item.sapaan} ${item.nama}</b><br>
                 Desa ${item.desa}
             `;
 
-            card.addEventListener("click",function(){
+            card.onclick=function(){
 
                 document.querySelectorAll(".card").forEach(c=>{
                     c.classList.remove("selected");
@@ -208,40 +213,31 @@ async function loadData(){
 
                 document.getElementById("rowInfo").innerText=
                     "Row : "+item.row;
-
-                console.log("ROW AKTIF =",rowAktif);
-
-            });
+            };
 
             list.appendChild(card);
 
         });
 
-    }
-    catch(error){
+    }catch(error){
+
         console.log(error);
 
         document.getElementById("listPasien").innerHTML=
             "Gagal memuat data";
+
     }
+
 }
 
 function kirim(){
 
-    if(rowAktif===null || rowAktif===undefined){
-
+    if(rowAktif==null){
         alert("Pilih pasien terlebih dahulu");
-
         return;
     }
 
-    const klaster=
-        document.getElementById("klaster").value;
-
-    console.log("Mengirim:",{
-        row:rowAktif,
-        klaster:klaster
-    });
+    const klaster=document.getElementById("klaster").value;
 
     fetch(API_URL,{
         method:"POST",
@@ -254,10 +250,8 @@ function kirim(){
             klaster:klaster
         })
     })
-    .then(response=>response.text())
-    .then(result=>{
-
-        console.log("RESPON SERVER:",result);
+    .then(response=>response.json())
+    .then(data=>{
 
         document.getElementById("status").style.display="block";
 
@@ -266,21 +260,28 @@ function kirim(){
 
         rowAktif=null;
 
+        document.getElementById("nama").innerText="Pilih pasien";
+        document.getElementById("desa").innerText="-";
+        document.getElementById("idPasien").innerText="ID Internal : -";
+        document.getElementById("rowInfo").innerText="Row : -";
+
         loadData();
+
     })
     .catch(error=>{
-
         console.log(error);
-
-        alert("Gagal mengirim pasien ke klaster");
-
+        alert("Gagal mengirim pasien");
     });
 
 }
 
 loadData();
 
-setInterval(loadData,5000);
+setInterval(()=>{
+    if(rowAktif==null){
+        loadData();
+    }
+},5000);
 
 </script>
 
